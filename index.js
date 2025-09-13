@@ -9,8 +9,8 @@ document.getElementById("appointmentForm").addEventListener("submit", function(e
         headers: {
             "Content-Type": "application/json"},
         body: JSON.stringify({
-            patient, doctor, date, time,
-             doctorPhone
+            patient, doctor, date, time
+             
         })
     }).then(response => response.json())
     .then(data => {
@@ -22,6 +22,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function(e
 
     });
 });
+
             
 
 
