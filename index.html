@@ -1,23 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Scheduler</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Medical Appointment Scheduler</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Book Appointment</h2>
+  <div class="container">
+    <h2>📅 Medical Appointment Scheduler</h2>
+
     <form id="appointmentForm">
-        Patient: <input type="text" id="patient" name="patient" required><br><br>
-        Doctor: <input type="text" id="doctor" name="doctor" required><br><br>
-        Date: <input type="date" id="date" name="date" required><br><br>
-        Time: <input type="time" id="time" name="time" required><br><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
-        <button type="submit">Book Appointment</button>
+      <input type="text" id="patient" placeholder="Patient Name" required>
+      <input type="text" id="doctor" placeholder="Doctor Name" required>
+      <input type="date" id="date" required>
+      <input type="time" id="time" required>
+       <input type="tel" id="phone" placeholder="Patient Phone (+countrycode)" required>
+      <input type="email" id="email" placeholder="Patient Email" required>
+      <input type="text" id="doctorPhone" placeholder="Doctor Phone (+countrycode)" required>
+      <button type="submit">Book Appointment</button>
     </form>
-<script src="index.js"></script>        
-    
+
+    <table id="appointmentsList">
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5" style="text-align:center; color:#6b7280;">No appointments yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById("appointmentForm");
+    const tableBody = document.querySelector("#appointmentsList tbody");
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const patient = document.getElementById("patient").value;
+      const doctor = document.getElementById("doctor").value;
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const doctorPhone = document.getElementById("doctorPhone").value;
+
+      // Update table
+      if(tableBody.children[0].children.length === 1){
+        tableBody.innerHTML = ""; // remove "No appointments yet"
+      }
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${patient}</td>
+        <td>${doctor}</td>
+        <td>${date}</td>
+        <td>${time}</td>
+        <td>
+          <button onclick="sendReminder('${patient}', '${doctor}', '${date}', '${time}', '${doctorPhone}', 'Prescription')">Prescription</button>
+          <button onclick="sendReminder('${patient}', '${doctor}', '${date}', '${time}', '${doctorPhone}', 'Sick Note')">Sick Note</button>
+          <button onclick="sendReminder('${patient}', '${doctor}', '${date}', '${time}', '${doctorPhone}', 'Specialist Referral')">Referral</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+      form.reset();
+    });
+
+    async function sendReminder(patient, doctor, date, time, doctorPhone, type) {
+      alert(`Reminder: ${type} for ${patient}`);
+      // Optional: send SMS via backend
+      try {
+        const res = await fetch("/send_sms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            patient,
+            doctor,
+            date,
+            time,
+            doctorPhone,
+            type
+          })
+        });
+        const data = await res.json();
+        if(data.success){
+          console.log(`✅ ${type} SMS sent`);
+        } else {
+          console.warn(`⚠️ ${type} SMS failed: ${data.error}`);
+        }
+      } catch(err){
+        console.error(`❌ Error sending ${type} SMS: ${err}`);
+      }
+    }
+  </script>
 </body>
 </html>
