@@ -7,6 +7,8 @@ const form = document.getElementById("appointmentForm");
       const doctor = document.getElementById("doctor").value;
       const date = document.getElementById("date").value;
       const time = document.getElementById("time").value;
+      const patientPhone = document.getElementById("phone").value;  
+        const patientEmail = document.getElementById("email").value;
       const doctorPhone = document.getElementById("doctorPhone").value;
 
       // Update table
